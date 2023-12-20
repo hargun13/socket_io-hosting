@@ -14,7 +14,7 @@
     <p>RIGHT REPS: <span id="right-counter">0</span></p>
 
     <script>
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var socket = io.connect('https://bicep-curl.onrender.com');
 
         socket.on('left_counter', function (data) {
             document.getElementById('left-counter').innerHTML = data.count;
