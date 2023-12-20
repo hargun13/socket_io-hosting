@@ -171,8 +171,8 @@ import time
 # import eventlet
 
 # eventlet.monkey_patch()
-from gevent import monkey
-monkey.patch_all()
+# from gevent import monkey
+# monkey.patch_all()
 
 app = Flask(__name__)
 CORS(app)
