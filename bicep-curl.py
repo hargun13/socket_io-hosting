@@ -168,9 +168,11 @@ import io
 from pathlib import Path
 from threading import Thread
 import time
-import eventlet
+# import eventlet
 
-eventlet.monkey_patch()
+# eventlet.monkey_patch()
+from gevent import monkey
+monkey.patch_all()
 
 app = Flask(__name__)
 CORS(app)
