@@ -1,10 +1,12 @@
 from flask import Flask, render_template, Response
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 import cv2
 import mediapipe as mp
 import numpy as np
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app)
 
 mp_drawing = mp.solutions.drawing_utils
