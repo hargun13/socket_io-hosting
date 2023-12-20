@@ -210,11 +210,17 @@ def handle_connect():
 
 def send_frame():
     cap = cv2.VideoCapture(0)
+    left_counter = 0
+    right_counter = 0
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         while cap.isOpened():
             ret, frame = cap.read()
 
+            # Check if the frame is empty
+            if not ret or frame is None:
+                continue
+            
             # Recolor image to RGB
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
