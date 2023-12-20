@@ -42,7 +42,7 @@ def handle_connect():
 def generate_frames():
     global left_counter, right_counter, left_stage, left_prev_stage, right_stage, right_prev_stage
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         while cap.isOpened():
