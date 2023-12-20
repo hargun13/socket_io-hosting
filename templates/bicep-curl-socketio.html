@@ -1,48 +1,15 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bicep Curl Counter</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
-</head>
-<body>
-    <h1>Bicep Curl Counter</h1>
-    <img id="video-feed" alt="Video Feed">
-    <p>LEFT REPS: <span id="left-counter">0</span></p>
-    <p>RIGHT REPS: <span id="right-counter">0</span></p>
-
-    <script>
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('left_counter', function (data) {
-            document.getElementById('left-counter').innerHTML = data.count;
-        });
-
-        socket.on('right_counter', function (data) {
-            document.getElementById('right-counter').innerHTML = data.count;
-        });
-
-        const img = document.getElementById('video-feed');
-        const source = new EventSource("/video_feed");
-
-        source.onmessage = function (event) {
-            img.src = 'data:image/jpeg;base64,' + event.data;
-        };
-    </script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bicep Curl Counter</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.3.0/simplepeer.min.js"></script>
 </head>
 <body>
     <h1>Bicep Curl Counter</h1>
-    <img id="video-feed" alt="Video Feed">
+    <video id="localVideo" autoplay></video>
     <p>LEFT REPS: <span id="left-counter">0</span></p>
     <p>RIGHT REPS: <span id="right-counter">0</span></p>
 
@@ -57,12 +24,36 @@
             document.getElementById('right-counter').innerHTML = data.count;
         });
 
-        const img = document.getElementById('video-feed');
-        const source = new EventSource("/video_feed");
+        const localVideo = document.getElementById('localVideo');
 
-        source.onmessage = function (event) {
-            img.src = 'data:image/jpeg;base64,' + event.data;
-        };
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then((stream) => {
+                localVideo.srcObject = stream;
+
+                const peer = new SimplePeer({
+                    initiator: window.location.hash === '#init',
+                    trickle: false,
+                    stream: stream, // Pass the stream to SimplePeer
+                });
+
+                peer.on('signal', (data) => {
+                    socket.emit('offer', data);
+                });
+
+                socket.on('offer', (data) => {
+                    peer.signal(data);
+                });
+
+                peer.on('stream', (stream) => {
+                    localVideo.srcObject = stream;
+                });
+            })
+            .catch((err) => console.error('Error accessing media devices:', err));
+
+        socket.on('video_frame', function (data) {
+            // Update the video element with the received frame
+            localVideo.src = 'data:image/jpeg;base64,' + data;
+        });
     </script>
 </body>
 </html>
